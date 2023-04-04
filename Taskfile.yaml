@@ -1,0 +1,37 @@
+version: '3'
+
+tasks:
+  clean:
+    cmds:
+      - rm -rf dist/
+
+  lint:
+    cmds:
+      - golangci-lint run
+
+  artifacts:
+    deps:
+      - clean
+    vars:
+      VERSION:
+        sh: git describe --tags --always
+      BUILD_FLAGS:
+        -ldflags="-s -w -X main.version={{ .VERSION }}" -trimpath -tags lambda.norpc
+    env:
+      CGO_ENABLED: 0
+      GOOS: "{{ .GOOS }}"
+      GOARCH: "{{ .GOARCH }}"
+
+    cmds:
+      - cmd: echo "Compiling packages for $GOOS/$GOARCH"
+        silent: true
+
+      - go build {{ .BUILD_FLAGS }} -o dist/bootstrap ./cmd/aws-lambda-api
+      - zip -j dist/terraform-registry.zip dist/bootstrap
+
+  package:
+    cmds:
+      - task: artifacts
+        vars:
+          GOOS: linux
+          GOARCH: amd64
