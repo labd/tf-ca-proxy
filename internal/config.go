@@ -5,8 +5,9 @@ import (
 )
 
 type AppConfig struct {
-	RegistryName   string `env:"REGISTRY_NAME"`
-	RegistryDomain string `env:"REGISTRY_DOMAIN"`
+	RegistryName   string   `env:"REGISTRY_NAME"`
+	RegistryDomain string   `env:"REGISTRY_DOMAIN"`
+	AuthTokens     []string `env:"AUTH_TOKENS" envSeparator:","`
 }
 
 var appConfig AppConfig

@@ -8,6 +8,7 @@ require (
 	github.com/awslabs/aws-lambda-go-api-proxy v0.14.0
 	github.com/caarlos0/env/v7 v7.1.0
 	github.com/davecgh/go-spew v1.1.1
+	github.com/elliotchance/pie/v2 v2.5.2
 	github.com/go-chi/chi/v5 v5.0.8
 	github.com/justinas/alice v1.2.0
 	github.com/rs/zerolog v1.29.0
@@ -25,6 +26,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.14.6 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.18.7 // indirect
 	github.com/aws/smithy-go v1.13.5 // indirect
+	golang.org/x/exp v0.0.0-20220321173239-a90fa8a75705 // indirect
 )
 
 require (
