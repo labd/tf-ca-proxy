@@ -1,0 +1,55 @@
+project_name: tf-ca-proxy
+
+builds:
+  - id: tf-ca-proxy-lambda
+    main: ./cmd/aws-lambda
+    binary: bootstrap
+    flags:
+      - -trimpath
+      - -tags=netgo
+    env:
+      - CGO_ENABLED=0
+    asmflags:
+      - all=-trimpath={{.Env.GOPATH}}
+    gcflags:
+      - all=-trimpath={{.Env.GOPATH}}
+    ldflags: |
+      -s -w -extldflags '-static'
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    mod_timestamp: '{{ .CommitTimestamp }}'
+
+checksum:
+  name_template: '{{ .ProjectName }}_{{ .Version }}_SHA256SUMS'
+  algorithm: sha256
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+
+archives:
+  - id: lambda
+    name_template: "tf-ca-proxy-{{.Version}}-{{.Os}}-{{.Arch}}{{ if .Arm }}v{{.Arm }}{{ end }}"
+    format: zip
+    files:
+      - LICENSE
+
+milestones:
+  -
+    repo:
+      owner: labd
+      name: tf-ca-proxy
+    close: true
+    fail_on_error: false
+    name_template: "{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
+
+# signs:
+#   - id: mach-composer
+#     artifacts: checksum
+#     args: ["--batch", "-u", "{{ .Env.GPG_FINGERPRINT }}", "--armor", "--output", "${signature}", "--detach-sign", "${artifact}"]
