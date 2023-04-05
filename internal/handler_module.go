@@ -85,7 +85,7 @@ func (m *moduleHandler) downloadHandler(w http.ResponseWriter, r *http.Request) 
 		panic(err)
 	}
 
-	url := fmt.Sprintf("https://%s/v1/modules/%s/%s/%s/%s/assets/%s?awsv4signedrequest=hier",
+	url := fmt.Sprintf("https://%s/v1/modules/%s/%s/%s/%s/assets/%s",
 		r.Host,
 		moduleRequest.Namespace,
 		moduleRequest.Name,
