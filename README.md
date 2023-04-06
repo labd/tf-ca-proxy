@@ -6,10 +6,11 @@ with the registry format.
 
 # Installation
 An example terraform deployment setup is available in the `deployment/` folder.
-There are three environment variables which need to be set:
+There are four environment variables which need to be set:
   - `REGISTRY_NAME`: the name of your CodeArtifact registry
   - `REGISTRY_DOMAIN`: the domain of your CodeArtifact registry
   - `AUTH_TOKENS`: a comma separate list of tokens for authentication
+  - `SECRET_KEY`: a secret key for signing the download URL's
 
 # Uploading new terraform modules
 Since this is using AWS CodeArtifact uploading new modules happens with the aws

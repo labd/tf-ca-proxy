@@ -26,6 +26,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.14.6 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.18.7 // indirect
 	github.com/aws/smithy-go v1.13.5 // indirect
+	github.com/itchyny/base58-go v0.2.0 // indirect
+	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
 	golang.org/x/exp v0.0.0-20220321173239-a90fa8a75705 // indirect
 )
 
@@ -33,6 +35,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.18.19
 	github.com/aws/aws-sdk-go-v2/service/codeartifact v1.18.0
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
+	github.com/leg100/surl v0.0.5
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/pkg/errors v0.9.1 // indirect

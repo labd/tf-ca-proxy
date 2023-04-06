@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/rs/zerolog"
 )
 
 type moduleRequestKey struct{}
@@ -32,7 +33,8 @@ func (m *moduleHandler) Router() chi.Router {
 }
 
 func (m *moduleHandler) versionListHandler(w http.ResponseWriter, r *http.Request) {
-	moduleRequest := GetModuleRequest(r.Context())
+	ctx := r.Context()
+	moduleRequest := GetModuleRequest(ctx)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -58,22 +60,28 @@ func (m *moduleHandler) versionListHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	if err := json.NewEncoder(w).Encode(result); err != nil {
-		panic(err)
+		zerolog.Ctx(ctx).Error().Err(err).Msg("failed to encode response")
 	}
 }
 
 func (m *moduleHandler) versionHandler(w http.ResponseWriter, r *http.Request) {
-	moduleRequest := GetModuleRequest(r.Context())
+	ctx := r.Context()
+
+	moduleRequest := GetModuleRequest(ctx)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
 	info, err := m.store.getModuleVersion(r.Context(), moduleRequest)
 	if err != nil {
-		panic(err)
+		zerolog.Ctx(ctx).Error().Err(err).Msg("failed to get module version")
+		http.Error(w, "Internal error", http.StatusInternalServerError)
+		return
 	}
 
 	if err := json.NewEncoder(w).Encode(info); err != nil {
-		panic(err)
+		zerolog.Ctx(ctx).Error().Err(err).Msg("failed to encode module version")
+		http.Error(w, "Internal error", http.StatusInternalServerError)
+		return
 	}
 }
 
@@ -82,9 +90,11 @@ func (m *moduleHandler) downloadHandler(w http.ResponseWriter, r *http.Request) 
 
 	filename, err := m.store.getModuleVersionAssets(r.Context(), moduleRequest)
 	if err != nil {
-		panic(err)
+		http.Error(w, "Internal error", http.StatusInternalServerError)
 	}
 
+	// Create the download URL and sign it since terraform doesn't pass the
+	// Authorization header to the download URL
 	url := fmt.Sprintf("https://%s/v1/modules/%s/%s/%s/%s/assets/%s",
 		r.Host,
 		moduleRequest.Namespace,
@@ -93,22 +103,37 @@ func (m *moduleHandler) downloadHandler(w http.ResponseWriter, r *http.Request) 
 		moduleRequest.Version,
 		filename)
 
-	w.Header().Add("X-Terraform-Get", url)
+	signedURL, err := signURL(url)
+	if err != nil {
+		http.Error(w, "Internal error", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Add("X-Terraform-Get", signedURL)
 	w.WriteHeader(http.StatusOK)
 }
 
 func (m *moduleHandler) assetHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 	moduleRequest := GetModuleRequest(r.Context())
 	asset := chi.URLParam(r, "asset")
 
+	if !verifyURL(r) {
+		http.Error(w, "Invalid URL", http.StatusBadRequest)
+		return
+	}
+
 	reader, err := m.store.downloadModuleVersion(r.Context(), moduleRequest, asset)
 	if err != nil {
-		panic(err)
+		zerolog.Ctx(ctx).Error().Err(err).Msg("failed to download module version")
+		http.Error(w, "Internal error", http.StatusInternalServerError)
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 	if _, err := io.Copy(w, reader); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		http.Error(w, "Internal error", http.StatusInternalServerError)
+		return
 	}
 }
 
