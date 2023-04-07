@@ -47,7 +47,9 @@ func (m *moduleHandler) versionListHandler(w http.ResponseWriter, r *http.Reques
 
 	versions, err := m.store.listModuleVersions(r.Context(), moduleRequest)
 	if err != nil {
-		panic(err)
+		zerolog.Ctx(ctx).Error().Err(err).Msg("failed to list module versions")
+		errorResponse(w, "Internal error", http.StatusInternalServerError)
+		return
 	}
 
 	result := ModuleVersionResponse{
@@ -61,6 +63,8 @@ func (m *moduleHandler) versionListHandler(w http.ResponseWriter, r *http.Reques
 
 	if err := json.NewEncoder(w).Encode(result); err != nil {
 		zerolog.Ctx(ctx).Error().Err(err).Msg("failed to encode response")
+		errorResponse(w, "Internal error", http.StatusInternalServerError)
+		return
 	}
 }
 
@@ -68,19 +72,18 @@ func (m *moduleHandler) versionHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	moduleRequest := GetModuleRequest(ctx)
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-
 	info, err := m.store.getModuleVersion(r.Context(), moduleRequest)
 	if err != nil {
 		zerolog.Ctx(ctx).Error().Err(err).Msg("failed to get module version")
-		http.Error(w, "Internal error", http.StatusInternalServerError)
+		errorResponse(w, "Internal error", http.StatusInternalServerError)
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(info); err != nil {
 		zerolog.Ctx(ctx).Error().Err(err).Msg("failed to encode module version")
-		http.Error(w, "Internal error", http.StatusInternalServerError)
+		errorResponse(w, "Internal error", http.StatusInternalServerError)
 		return
 	}
 }
@@ -90,7 +93,8 @@ func (m *moduleHandler) downloadHandler(w http.ResponseWriter, r *http.Request) 
 
 	filename, err := m.store.getModuleVersionAssets(r.Context(), moduleRequest)
 	if err != nil {
-		http.Error(w, "Internal error", http.StatusInternalServerError)
+		errorResponse(w, "Internal error", http.StatusInternalServerError)
+		return
 	}
 
 	// Create the download URL and sign it since terraform doesn't pass the
@@ -105,7 +109,7 @@ func (m *moduleHandler) downloadHandler(w http.ResponseWriter, r *http.Request) 
 
 	signedURL, err := signURL(url)
 	if err != nil {
-		http.Error(w, "Internal error", http.StatusInternalServerError)
+		errorResponse(w, "Internal error", http.StatusInternalServerError)
 		return
 	}
 

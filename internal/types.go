@@ -2,6 +2,10 @@ package internal
 
 import "time"
 
+type ErrorResponse struct {
+	Error string `json:"error"`
+}
+
 type ModuleRequest struct {
 	Namespace string
 	Name      string

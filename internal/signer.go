@@ -7,6 +7,7 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/leg100/surl"
+	"github.com/rs/zerolog"
 )
 
 // GenerateRandomBytes returns securely generated random bytes.
@@ -34,5 +35,8 @@ func verifyURL(r *http.Request) bool {
 	url := "https://" + r.Host + r.URL.String()
 	signer := surl.New([]byte(appConfig.SecretKey))
 	err := signer.Verify(url)
+	if err != nil {
+		zerolog.Ctx(r.Context()).Error().Err(err).Msgf("Error verifying URL")
+	}
 	return err == nil
 }
