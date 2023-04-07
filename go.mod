@@ -10,6 +10,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1
 	github.com/elliotchance/pie/v2 v2.5.2
 	github.com/go-chi/chi/v5 v5.0.8
+	github.com/joho/godotenv v1.5.1
 	github.com/justinas/alice v1.2.0
 	github.com/rs/zerolog v1.29.0
 	github.com/spf13/cobra v1.6.1

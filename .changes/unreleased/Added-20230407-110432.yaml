@@ -1,0 +1,3 @@
+kind: Added
+body: Add support for loading env vars from .env file
+time: 2023-04-07T11:04:32.875028+02:00

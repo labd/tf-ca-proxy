@@ -2,8 +2,10 @@ package internal
 
 import (
 	"encoding/base64"
+	"os"
 
 	"github.com/caarlos0/env/v7"
+	"github.com/joho/godotenv"
 )
 
 type AppConfig struct {
@@ -16,6 +18,11 @@ type AppConfig struct {
 var appConfig AppConfig
 
 func init() {
+
+	if _, err := os.Stat(".env"); err == nil {
+		godotenv.Load(".env")
+	}
+
 	if err := env.Parse(&appConfig); err != nil {
 		panic(err)
 	}
