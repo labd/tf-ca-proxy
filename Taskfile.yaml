@@ -26,7 +26,7 @@ tasks:
       - cmd: echo "Compiling packages for $GOOS/$GOARCH"
         silent: true
 
-      - go build {{ .BUILD_FLAGS }} -o dist/bootstrap ./cmd/aws-lambda-api
+      - go build {{ .BUILD_FLAGS }} -o dist/bootstrap ./cmd/aws-lambda
       - zip -j dist/terraform-registry.zip dist/bootstrap
 
   package:
