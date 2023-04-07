@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/leg100/surl"
 	"github.com/rs/zerolog"
 )
@@ -26,13 +25,20 @@ func generateRandomBytes(n int) ([]byte, error) {
 }
 
 func signURL(url string) (string, error) {
-	spew.Dump(url)
 	signer := surl.New([]byte(appConfig.SecretKey))
 	return signer.Sign(url, 60*time.Second)
 }
 
 func verifyURL(r *http.Request) bool {
-	url := "https://" + r.Host + r.URL.String()
+	url := r.URL.String()
+
+	// The lambda function is called with a absolute URL, but the standalone
+	// version is called with a relative URL. We need to make sure we have an
+	// absolute URL before we can verify it.
+	if !r.URL.IsAbs() {
+		url = "https://" + r.Host + url
+	}
+
 	signer := surl.New([]byte(appConfig.SecretKey))
 	err := signer.Verify(url)
 	if err != nil {
