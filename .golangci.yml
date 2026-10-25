@@ -1,20 +1,21 @@
+version: "2"
 linters:
-  disable-all: true
+  default: none
   enable:
-  - asciicheck
-  - bodyclose
-  - contextcheck
-  - cyclop
-  - errcheck
-  - exhaustive
-  - exportloopref
-  - forcetypeassert
-  - goimports
-  - gosimple
-  - govet
-  - ineffassign
-  - predeclared
-  - staticcheck
-  - tenv
-  - typecheck
-  - unused
+    - asciicheck
+    - bodyclose
+    - contextcheck
+    - copyloopvar
+    - cyclop
+    - errcheck
+    - exhaustive
+    - forcetypeassert
+    - govet
+    - ineffassign
+    - predeclared
+    - staticcheck
+    - unused
+    - usetesting
+formatters:
+  enable:
+    - goimports
